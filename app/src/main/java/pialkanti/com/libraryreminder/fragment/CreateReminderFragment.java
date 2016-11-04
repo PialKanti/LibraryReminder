@@ -52,7 +52,7 @@ public class CreateReminderFragment extends Fragment {
     FloatingActionButton fab_OK;
     String earlist_due_date = "";
     private int mYear, mMonth, mDay, mHour, mMinute, mSecond;
-    String repeat;
+    String repeat = "0";
 
     @Nullable
     @Override
@@ -110,18 +110,25 @@ public class CreateReminderFragment extends Fragment {
         reminderAdapter = new CreateReminderAdapter(getActivity(), icons, textItem);
         list.setAdapter(reminderAdapter);
 
+
+        final Calendar c = Calendar.getInstance();
+
+        // Get Current Date
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        // Get Current Time
+        mHour = c.get(Calendar.HOUR);
+        mMinute = c.get(Calendar.MINUTE);
+        mSecond = c.get(Calendar.SECOND);
+
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> adapterView, View view, int i, long l) {
                 final TextView reminder_txt = (TextView) view.findViewById(R.id.text_reminder);
                 //Opens Datepicker
                 if (i == 0) {
-                    // Get Current Date
-                    final Calendar c = Calendar.getInstance();
-                    mYear = c.get(Calendar.YEAR);
-                    mMonth = c.get(Calendar.MONTH);
-                    mDay = c.get(Calendar.DAY_OF_MONTH);
-
 
                     DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
                             new DatePickerDialog.OnDateSetListener() {
@@ -129,13 +136,18 @@ public class CreateReminderFragment extends Fragment {
                                 @Override
                                 public void onDateSet(DatePicker view, int year,
                                                       int monthOfYear, int dayOfMonth) {
+                                    mYear = year;
+                                    mMonth = monthOfYear;
+                                    mDay = dayOfMonth;
                                     try {
+                                        Calendar calendar = Calendar.getInstance();
                                         String inputDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                                        String todayDate = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR);
                                         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                                         Date strDate = sdf.parse(inputDate);
+                                        Date currentDate = sdf.parse(todayDate);
                                         Date expireDate = sdf.parse(earlist_due_date);
-                                        Log.i("Pial", inputDate + " " + earlist_due_date);
-                                        if (strDate.getTime() < System.currentTimeMillis()) {
+                                        if (strDate.before(currentDate)) {
                                             //checks if input date is before today's date and shows alert dialog
                                             AlertDialog.Builder builderRepeatAlarm = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dark_Dialog);
                                             builderRepeatAlarm.setTitle("Warning");
@@ -176,19 +188,14 @@ public class CreateReminderFragment extends Fragment {
                             }, mYear, mMonth, mDay);
                     datePickerDialog.show();
                 } else if (i == 1) {
-                    // Get Current Time
-                    final Calendar c = Calendar.getInstance();
-                    mHour = c.get(Calendar.HOUR);
-                    mMinute = c.get(Calendar.MINUTE);
-                    mSecond = c.get(Calendar.SECOND);
-
                     // Launch Time Picker Dialog
                     TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
                             new TimePickerDialog.OnTimeSetListener() {
 
                                 @Override
-                                public void onTimeSet(TimePicker view, int hourOfDay,
-                                                      int minute) {
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    mHour = hourOfDay;
+                                    mMinute = minute;
                                     try {
                                         if (hourOfDay > 12) {
                                             reminder_txt.setText((hourOfDay - 12) + ":" + minute + " PM");
@@ -255,9 +262,10 @@ public class CreateReminderFragment extends Fragment {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
                 calendar.clear();
-                calendar.set(mYear, mMonth, mDay, mHour, mMinute, mSecond);
+                calendar.set(mYear, mMonth, mDay, mHour, mMinute, 0);
 
                 //Insert Alarm details into Database
+                Log.i("Check", repeat);
                 dBadapter.insertAlarmDetails(mYear, mMonth, mDay, mHour, mMinute, mSecond, repeat);
 
                 Intent notificationIntent = new Intent("android.media.action.DISPLAY_NOTIFICATION");

@@ -64,7 +64,7 @@ public class DBadapter {
         values.put(database.Column_REPEAT, repeat);
 
 
-        long insert = db.insert(database.Table_Name, null, values);
+        long insert = db.insert(database.Alarm_Table_Name, null, values);
 
     }
 
@@ -79,7 +79,6 @@ public class DBadapter {
             cursor.moveToNext();
         }
         cursor.close();
-        closeDatabase();
         return book_List;
     }
 
@@ -94,7 +93,6 @@ public class DBadapter {
             cursor.moveToNext();
         }
         cursor.close();
-        closeDatabase();
         return alarm_List;
     }
 

@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ public class RemindMeFragment extends Fragment {
     ListView alarmList;
     ArrayList<AlarmDetails> alarm;
     AlarmListAdapter alarmListAdapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_remind_me,
@@ -38,18 +40,21 @@ public class RemindMeFragment extends Fragment {
         ((UserHomeActivity) getActivity()).getSupportActionBar().setTitle("Reminder");
 
         reminderText = (TextView) view.findViewById(R.id.Reminder_text);
-        alarmList = (ListView)view.findViewById(R.id.Reminder_listView);
+        alarmList = (ListView) view.findViewById(R.id.Reminder_listView);
         fab = (FloatingActionButton) view.findViewById(R.id.fab_add_button);
 
         DBadapter dBadapter = new DBadapter(getActivity().getApplicationContext());
 
+        Log.i("Pial", dBadapter.AlarmTableSize() + "");
         if (dBadapter.AlarmTableSize() == 0) {
+            reminderText.setVisibility(View.VISIBLE);
             reminderText.setText("No Active Reminders!");
             alarmList.setVisibility(View.GONE);
-        }else{
+        } else {
+            alarmList.setVisibility(View.VISIBLE);
             reminderText.setVisibility(View.GONE);
             alarm = dBadapter.getAlarmInfo();
-            alarmListAdapter = new AlarmListAdapter(getActivity(),alarm);
+            alarmListAdapter = new AlarmListAdapter(getActivity(), alarm);
             alarmList.setAdapter(alarmListAdapter);
 
         }

@@ -19,8 +19,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 
         Notification notification = builder.setContentTitle("KUET Library Reminder")
-                .setContentText("New Notification From Demo App..")
-                .setTicker("New Message Alert!")
+                .setContentText("You have a book to renew.")
+                .setTicker("Hurry")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.person))
                 .build();

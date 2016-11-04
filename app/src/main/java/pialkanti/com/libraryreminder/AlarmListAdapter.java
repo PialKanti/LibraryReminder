@@ -1,6 +1,7 @@
 package pialkanti.com.libraryreminder;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,13 +36,14 @@ public class AlarmListAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolderItem viewHolder;
-        if (convertView != null) {
+        if (convertView == null) {
             LayoutInflater inflater = context.getLayoutInflater();
             convertView = inflater.inflate(R.layout.alarm_list_row, null, true);
             viewHolder = new ViewHolderItem();
             viewHolder.reminderDate = (TextView) convertView.findViewById(R.id.reminder_date);
             viewHolder.reminderTime = (TextView) convertView.findViewById(R.id.reminder_time);
             viewHolder.reminderRepeat = (TextView) convertView.findViewById(R.id.reminder_repeat);
+            convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolderItem) convertView.getTag();
         }
@@ -54,6 +56,8 @@ public class AlarmListAdapter extends ArrayAdapter<String> {
         repeat = alarmDetails.get(position).getRepeat();
 
         viewHolder.reminderDate.setText(day + "/" + (month + 1) + "/" + year);
+        Log.i("Pial", day + "/" + (month + 1) + "/" + year);
+
         if (hour > 12) {
             viewHolder.reminderTime.setText((hour - 12) + ":" + minute + " PM");
         } else if (hour == 12) {
@@ -65,14 +69,16 @@ public class AlarmListAdapter extends ArrayAdapter<String> {
                 viewHolder.reminderTime.setText("12" + ":" + minute + " AM");
         }
 
-        if (repeat == "0") {
+        if (repeat.equals("0")) {
             viewHolder.reminderRepeat.setText("No Repeating");
-        } else if (repeat == "0.25") {
-            viewHolder.reminderRepeat.setText("Every 15 minutes");
-        } else if (repeat == "0.5") {
-            viewHolder.reminderRepeat.setText("Every half hour");
+        } else if (repeat.equals("0.25")) {
+            viewHolder.reminderRepeat.setText("15 minutes");
+        } else if (repeat.equals("0.5")) {
+            viewHolder.reminderRepeat.setText("half hour");
+        } else if (repeat.equals("1")) {
+            viewHolder.reminderRepeat.setText("1 hour");
         } else {
-            viewHolder.reminderRepeat.setText("Every " + repeat + " hour");
+            viewHolder.reminderRepeat.setText(repeat + " hours");
         }
 
         return convertView;
