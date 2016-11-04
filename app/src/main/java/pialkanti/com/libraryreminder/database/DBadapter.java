@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import pialkanti.com.libraryreminder.POJO.AlarmDetails;
 import pialkanti.com.libraryreminder.POJO.BookDetails;
 
 
@@ -52,6 +53,21 @@ public class DBadapter {
 
     }
 
+    public void insertAlarmDetails(int year, int month, int day, int hour, int minute, int second, String repeat) {
+        ContentValues values = new ContentValues();
+        values.put(database.Column_YEAR, year);
+        values.put(database.Column_MONTH, month);
+        values.put(database.Column_DAY, day);
+        values.put(database.Column_HOUR, hour);
+        values.put(database.Column_MINUTE, minute);
+        values.put(database.Column_SECOND, second);
+        values.put(database.Column_REPEAT, repeat);
+
+
+        long insert = db.insert(database.Table_Name, null, values);
+
+    }
+
     public ArrayList<BookDetails> getBookInfo() {
         BookDetails book = null;
         ArrayList<BookDetails> book_List = new ArrayList<>();
@@ -67,8 +83,30 @@ public class DBadapter {
         return book_List;
     }
 
-    public int Size() {
+    public ArrayList<AlarmDetails> getAlarmInfo() {
+        AlarmDetails alarm = null;
+        ArrayList<AlarmDetails> alarm_List = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + database.Alarm_Table_Name, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            alarm = new AlarmDetails(cursor.getInt(1), cursor.getInt(2), cursor.getInt(3), cursor.getInt(4),cursor.getInt(5),cursor.getInt(6),cursor.getString(7));
+            alarm_List.add(alarm);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        closeDatabase();
+        return alarm_List;
+    }
+
+    public int BookTableSize() {
         String size_query = "SELECT " + database.Column_BOOK + " FROM " + database.Table_Name;
+        Cursor cursor = db.rawQuery(size_query, null);
+
+        return cursor.getCount();
+    }
+
+    public int AlarmTableSize() {
+        String size_query = "SELECT " + database.Column_YEAR + " FROM " + database.Alarm_Table_Name;
         Cursor cursor = db.rawQuery(size_query, null);
 
         return cursor.getCount();

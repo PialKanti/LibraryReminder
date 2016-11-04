@@ -52,7 +52,8 @@ public class CreateReminderFragment extends Fragment {
     FloatingActionButton fab_OK;
     String earlist_due_date = "";
     private int mYear, mMonth, mDay, mHour, mMinute, mSecond;
-    double repeat;
+    String repeat;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -85,7 +86,7 @@ public class CreateReminderFragment extends Fragment {
 
         //getting earlist due date from database
 
-        DBadapter dBadapter = new DBadapter(getActivity().getApplicationContext());
+        final DBadapter dBadapter = new DBadapter(getActivity().getApplicationContext());
 
         bookDetails = new ArrayList<>();
 
@@ -129,14 +130,14 @@ public class CreateReminderFragment extends Fragment {
                                 public void onDateSet(DatePicker view, int year,
                                                       int monthOfYear, int dayOfMonth) {
                                     try {
-                                        String inputDate = dayOfMonth+"/"+(monthOfYear+1)+"/"+year;
+                                        String inputDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
                                         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                                         Date strDate = sdf.parse(inputDate);
                                         Date expireDate = sdf.parse(earlist_due_date);
-                                        Log.i("Pial",inputDate +" "+earlist_due_date);
-                                        if(strDate.getTime() < System.currentTimeMillis()){
+                                        Log.i("Pial", inputDate + " " + earlist_due_date);
+                                        if (strDate.getTime() < System.currentTimeMillis()) {
                                             //checks if input date is before today's date and shows alert dialog
-                                            AlertDialog.Builder builderRepeatAlarm = new AlertDialog.Builder(getActivity(),R.style.AppTheme_Dark_Dialog);
+                                            AlertDialog.Builder builderRepeatAlarm = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dark_Dialog);
                                             builderRepeatAlarm.setTitle("Warning");
                                             builderRepeatAlarm.setMessage("Please select the upcoming date for reminder.");
                                             builderRepeatAlarm.setNegativeButton(
@@ -150,10 +151,10 @@ public class CreateReminderFragment extends Fragment {
                                             AlertDialog dialog = builderRepeatAlarm.create();
                                             dialog.show();
 
-                                        }else if(strDate.getTime() >= System.currentTimeMillis() && strDate.after(expireDate)){
-                                            AlertDialog.Builder builderRepeatAlarm = new AlertDialog.Builder(getActivity(),R.style.AppTheme_Dark_Dialog);
+                                        } else if (strDate.getTime() >= System.currentTimeMillis() && strDate.after(expireDate)) {
+                                            AlertDialog.Builder builderRepeatAlarm = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dark_Dialog);
                                             builderRepeatAlarm.setTitle("Warning");
-                                            builderRepeatAlarm.setMessage("Please select a date before earliest expired date, "+earlist_due_date);
+                                            builderRepeatAlarm.setMessage("Please select a date before earliest expired date, " + earlist_due_date);
                                             builderRepeatAlarm.setNegativeButton(
                                                     "Ok",
                                                     new DialogInterface.OnClickListener() {
@@ -164,8 +165,7 @@ public class CreateReminderFragment extends Fragment {
                                                     });
                                             AlertDialog dialog = builderRepeatAlarm.create();
                                             dialog.show();
-                                        }
-                                        else{
+                                        } else {
                                             reminder_txt.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
                                         }
                                     } catch (Exception e) {
@@ -206,9 +206,9 @@ public class CreateReminderFragment extends Fragment {
                                 }
                             }, mHour, mMinute, false);
                     timePickerDialog.show();
-                } else if (i == 2){
+                } else if (i == 2) {
                     //This shows repeat alarm time options
-                    AlertDialog.Builder builderRepeatAlarm = new AlertDialog.Builder(getActivity(),R.style.AppTheme_Dark_Dialog);
+                    AlertDialog.Builder builderRepeatAlarm = new AlertDialog.Builder(getActivity(), R.style.AppTheme_Dark_Dialog);
                     builderRepeatAlarm.setTitle("Select time for repeat :");
 
                     final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
@@ -221,8 +221,8 @@ public class CreateReminderFragment extends Fragment {
                     arrayAdapter.add("Every 2 hours");
                     arrayAdapter.add("Every 3 hours");
 
-                    final String[] choice = {"No Repeating","Every 15 minutes","Every half hour","Every 1 hour","Every 2 hours","Every 3 hours"};
-                    final double[] repeatTime = {0,0.25,0.5,1,2,3};
+                    final String[] choice = {"No Repeating", "Every 15 minutes", "Every half hour", "Every 1 hour", "Every 2 hours", "Every 3 hours"};
+                    final String[] repeatTime = {"0", "0.25", "0.5", "1", "2", "3"};
 
                     builderRepeatAlarm.setNegativeButton(
                             "Cancel",
@@ -256,6 +256,9 @@ public class CreateReminderFragment extends Fragment {
                 calendar.setTimeInMillis(System.currentTimeMillis());
                 calendar.clear();
                 calendar.set(mYear, mMonth, mDay, mHour, mMinute, mSecond);
+
+                //Insert Alarm details into Database
+                dBadapter.insertAlarmDetails(mYear, mMonth, mDay, mHour, mMinute, mSecond, repeat);
 
                 Intent notificationIntent = new Intent("android.media.action.DISPLAY_NOTIFICATION");
                 notificationIntent.addCategory("android.intent.category.DEFAULT");
