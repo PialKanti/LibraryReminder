@@ -24,6 +24,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     // IF the view under inflation and population is header or Item
     private static final int TYPE_ITEM = 1;
 
+
     private String mNavTitles[]; // String Array to store the passed titles Value from MainActivity.java
     private int mIcons[];       // Int Array to store the passed icons resource value from MainActivity.java
 
